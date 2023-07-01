@@ -55,7 +55,7 @@ class ObfuscatedInfo {
 	}
 	
 	calculateMerklePath(index, tree) {
-		const leaves = []
+		const path = []
 		const power = howManyLevels(tree[tree.length - 1].length)
 		let indexOffset = 0
 		let levelOffset = 1
@@ -63,26 +63,26 @@ class ObfuscatedInfo {
 		let left = !!(index & powerMask)
 		do {
 			if (left) {
-				leaves.push(tree[levelOffset][indexOffset])
+				path.push(tree[levelOffset][indexOffset])
 				if (indexOffset === 0) {
 					indexOffset = 2
 				} else {
 					indexOffset *= 2
 				}
 			} else {
-				leaves.push(tree[levelOffset][indexOffset + 1])
+				path.push(tree[levelOffset][indexOffset + 1])
 			}
 			levelOffset++
 			powerMask--
 			left = !!(index & powerMask)
 		} while (power >= levelOffset)
 		
-		return leaves
+		return path
 	}
 
     getValue(key) {
 		const formatted = this.obj[key]
-		formatted.leaves = formatted.leaves.map(leaf => leaf.toString('hex'))
+		formatted.path = formatted.path.map(leaf => leaf.toString('hex'))
         return formatted
     }
 
