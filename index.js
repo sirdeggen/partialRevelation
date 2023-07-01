@@ -1,9 +1,9 @@
 const { createHash } = require('crypto')
 
 function sha256d(string) {
-    return createHash('sha256')
-        .update(createHash('sha256').update(string).digest())
-        .digest()
+	return createHash('sha256')
+		.update(createHash('sha256').update(string).digest())
+		.digest()
 }
 
 function howManyLevels(leaves) {
@@ -12,48 +12,48 @@ function howManyLevels(leaves) {
 
 
 class ObfuscatedInfo {
-    constructor(obj) {
-        this.obj = {}
-        const paramHashes = Object.keys(obj)
-            .sort()
-            .map((key, index) => {
+	constructor(obj) {
+		this.obj = {}
+		const paramHashes = Object.keys(obj)
+			.sort()
+			.map((key, index) => {
 				const value = String(obj[key])
-                const hash = Buffer.from(sha256d(Buffer.from(value)))
-                this.obj[key] = { index, value }
-                return hash
-            })
+				const hash = Buffer.from(sha256d(Buffer.from(value)))
+				this.obj[key] = { index, value }
+				return hash
+			})
 		const tree = []
 		tree.unshift(paramHashes)
-        this.hashEachLevel(paramHashes, tree)
+		this.hashEachLevel(paramHashes, tree)
 		this.calculateMerklePaths(tree)
 		this.root = tree[0][0].toString('hex')
-        return this
-    }
+		return this
+	}
 
-    hashEachLevel(level, tree) {
-        const nextLevel = []
+	hashEachLevel(level, tree) {
+		const nextLevel = []
 		if (level.length % 2) {
 			level.push(level[level.length -1])
 		}
-        level.map((hash, idx) => {
-            if (idx % 2) {
-                nextLevel.push(sha256d(Buffer.concat([level[idx - 1], hash])))
-            }
-            if (idx === level.length - 1) {
-                tree.unshift(nextLevel)
-                if (nextLevel.length > 1) {
+		level.map((hash, idx) => {
+			if (idx % 2) {
+				nextLevel.push(sha256d(Buffer.concat([level[idx - 1], hash])))
+			}
+			if (idx === level.length - 1) {
+				tree.unshift(nextLevel)
+				if (nextLevel.length > 1) {
 					this.hashEachLevel(nextLevel, tree)
 				}
-            }
-        })
-    }
-
-    calculateMerklePaths(tree) {
-		Object.keys(this.obj).map((key, idx) => {
-			this.obj[key].leaves = this.calculateMerklePath(idx, tree)
+			}
 		})
 	}
-	
+
+	calculateMerklePaths(tree) {
+		Object.keys(this.obj).map((key, idx) => {
+			this.obj[key].path = this.calculateMerklePath(idx, tree)
+		})
+	}
+
 	calculateMerklePath(index, tree) {
 		const path = []
 		const power = howManyLevels(tree[tree.length - 1].length)
@@ -76,15 +76,15 @@ class ObfuscatedInfo {
 			powerMask--
 			left = !!(index & powerMask)
 		} while (power >= levelOffset)
-		
+
 		return path
 	}
 
-    getValue(key) {
+	getValue(key) {
 		const formatted = this.obj[key]
-		formatted.path = formatted.path.map(leaf => leaf.toString('hex'))
-        return formatted
-    }
+		formatted.path = formatted.path.map(h => h.toString('hex'))
+		return formatted
+	}
 
 }
 
