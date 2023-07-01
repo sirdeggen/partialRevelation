@@ -14,7 +14,7 @@ This will expose the value of "first" along with a proof that it belongs to the 
 {
   index: 1,
   value: 'Darren',
-  leaves: [
+  path: [
     'ddc3bb1da8949bdc381b6634b981fd6ae2853eeb037307f2369ad59a1f1db3a1',
     'd0be549c1399ec5e1183903be29fe3ae652ff632fa6a559377ea2746a1391c98'
   ]
