@@ -26,8 +26,7 @@ class ObfuscatedInfo {
 		tree.unshift(paramHashes)
         this.hashEachLevel(paramHashes, tree)
 		this.calculateMerklePaths(tree)
-		
-		console.log(this.obj)
+		this.root = tree[0][0].toString('hex')
         return this
     }
 
@@ -82,10 +81,14 @@ class ObfuscatedInfo {
 	}
 
     getValue(key) {
-        return this.obj[key]
+		const formatted = this.obj[key]
+		formatted.leaves = formatted.leaves.map(leaf => leaf.toString('hex'))
+        return formatted
     }
 
 }
 
-var b = new ObfuscatedInfo({ one: 1, two: 'this', three: 'something', four: 123, five: 89 })
- 
+const partialReveal = new ObfuscatedInfo({ first: "Darren", last: "Kellenschwiler", nickname: "Deggen", phone: 123412341234, email: "boop@gmail.com", other: "stuff" })
+
+partialReveal.getValue('first')
+partialReveal.root
